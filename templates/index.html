@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fake News Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="line"></div>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>📰 Fake News Detection</h1>
+        <p>AI-powered verification system</p>
+    </div>
+
+    <!-- INPUT CARD -->
+    <div class="card">
+        <form action="/predict" method="post" onsubmit="showLoader()">
+            <textarea name="news" placeholder="Enter news here..." required></textarea>
+            <button type="submit">Analyze</button>
+        </form>
+
+        <!-- LOADER -->
+        <div id="loader" class="loader" style="display:none;"></div>
+
+        {% if result %}
+
+        <!-- RESULT -->
+        <div class="result-card {% if result == 'REAL' %}real{% else %}fake{% endif %}">
+            <h2>{{ result }}</h2>
+            <p>Real: {{ real_prob }}% | Fake: {{ fake_prob }}%</p>
+        </div>
+
+        <!-- STATS CARDS 
+        <div class="stats">
+            <div class="stat-card real-box">
+                <h3>Real</h3>
+                <p>{{ real_prob }}%</p>
+            </div>
+            <div class="stat-card fake-box">
+                <h3>Fake</h3>
+                <p>{{ fake_prob }}%</p>
+            </div>-->
+        </div>
+
+        <!-- CHART -->
+        <div class="chart-container">
+            <canvas id="chart"></canvas>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 🔥 FEATURES (HORIZONTAL) -->
+    <div class="features">
+
+        <div class="feature-card">
+            <div class="icon">⚡</div>
+            <h3>Fast Processing</h3>
+            <p>
+                Instant predictions
+                <span class="more-text" id="m1"> using optimized ML pipeline.</span>
+            </p>
+            <button onclick="toggleText('m1')">Read More</button>
+            <span class="badge">Speed</span>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">🧠</div>
+            <h3>AI Powered</h3>
+            <p>
+                Smart NLP model
+                <span class="more-text" id="m2"> using TF-IDF + Logistic Regression.</span>
+            </p>
+            <button onclick="toggleText('m2')">Read More</button>
+            <span class="badge">AI Model</span>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">🔍</div>
+            <h3>Reliable Detection</h3>
+            <p>
+                Detect fake news
+                <span class="more-text" id="m3"> based on trained patterns.</span>
+            </p>
+            <button onclick="toggleText('m3')">Read More</button>
+            <span class="badge">Accuracy</span>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function showLoader() {
+    document.getElementById("loader").style.display = "block";
+}
+
+function toggleText(id) {
+    let el = document.getElementById(id);
+    el.style.display = (el.style.display === "inline") ? "none" : "inline";
+}
+
+{% if result %}
+new Chart(document.getElementById("chart"), {
+    type: 'doughnut',
+    data: {
+        labels: ['Real','Fake'],
+        datasets: [{
+            data: [{{ real_prob }}, {{ fake_prob }}],
+            backgroundColor: ['#00f5a0','#ff4d4d']
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                labels: { color: "white" }
+            }
+        }
+    }
+});
+{% endif %}
+</script>
+
+</body>
+</html>
